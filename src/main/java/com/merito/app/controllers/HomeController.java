@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import com.merito.app.categories.Category;
 import com.merito.app.categories.Book;
 import com.merito.app.categories.Movie;
+import com.merito.app.categories.Music;
 
 @Controller
 public class HomeController {
@@ -33,14 +34,17 @@ public class HomeController {
         }
     }
 
-    static List<SearchOption> optionsMovies = Arrays.asList(new SearchOption[]
-            {new SearchOption("Books", false), new SearchOption("Movies", true)});
     static List<SearchOption> optionsBooks = Arrays.asList(new SearchOption[]
-            {new SearchOption("Books", true), new SearchOption("Movies", false)});
+            {new SearchOption("Books", true), new SearchOption("Movies", false), new SearchOption("Music", false)});
+    static List<SearchOption> optionsMovies = Arrays.asList(new SearchOption[]
+            {new SearchOption("Books", false), new SearchOption("Movies", true), new SearchOption("Music", false)});
+    static List<SearchOption> optionsMusic = Arrays.asList(new SearchOption[]
+            {new SearchOption("Books", false), new SearchOption("Movies", false), new SearchOption("Music", true)});
 
     static List<Category> empty = new ArrayList<Category>();
     static List<Book> books = new ArrayList<Book>();
     static List<Movie> movies = new ArrayList<Movie>();
+    static List<Music> music = new ArrayList<Music>();
 
     static public void initialize() {
         movies.add(new Movie("George Lucas", "Star Wars: A New Hope"));
@@ -54,6 +58,10 @@ public class HomeController {
         books.add(new Book("Andrzej Sapkowski", "The Last Wish"));
         books.add(new Book("Dmitry Glukhovsky", "Metro 2033"));
         books.add(new Book("DecoMorreno", "Extra Dark"));
+
+        music.add(new Music("Krzysztof Krawczyk", "Parostatek"));
+        music.add(new Music("Krzysztof Krawczyk", "Mój Przyjacielu"));
+        music.add(new Music("Caravan Palace", "Lone Digger"));
     }
 
     private List<? extends Category> getItems(String category) {
@@ -62,6 +70,9 @@ public class HomeController {
         }
         if (category.equals("movies")) {
             return movies;
+        }
+        if (category.equals("music")) {
+            return music;
         }
         return empty;
     }
@@ -83,6 +94,8 @@ public class HomeController {
             model.addAttribute("searchOptions", this.optionsBooks);
         } else if (category.equals("movies")) {
             model.addAttribute("searchOptions", this.optionsMovies);
+        } else if (category.equals("music")) {
+            model.addAttribute("searchOptions", this.optionsMusic);
         }
     }
 
