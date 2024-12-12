@@ -9,23 +9,20 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
 
-import com.merito.app.models.Category;
-import com.merito.app.models.Book;
-import com.merito.app.models.Movie;
+import com.merito.app.categories.Category;
+import com.merito.app.categories.Book;
+import com.merito.app.categories.Movie;
 
 @Controller
 public class HomeController {
-    private class SearchOption {
+    private static class SearchOption {
         String name;
         boolean isSelected;
 
-        public SearchOption(String name) {
+        public SearchOption(String name, boolean selected) {
             this.name = name;
-            this.isSelected = false;
+            this.isSelected = selected;
         }
-
-        public void select() { this.isSelected = true; }
-        public void unselect() { this.isSelected = false; }
 
         public String getOption() {
             return this.name;
@@ -36,9 +33,10 @@ public class HomeController {
         }
     }
 
-    SearchOption moviesOption = new SearchOption("Movies");
-    SearchOption booksOption = new SearchOption("Books");
-    List<SearchOption> options = Arrays.asList(new SearchOption[] {booksOption, moviesOption});
+    static List<SearchOption> optionsMovies = Arrays.asList(new SearchOption[]
+            {new SearchOption("Books", false), new SearchOption("Movies", true)});
+    static List<SearchOption> optionsBooks = Arrays.asList(new SearchOption[]
+            {new SearchOption("Books", true), new SearchOption("Movies", false)});
 
     static List<Category> empty = new ArrayList<Category>();
     static List<Book> books = new ArrayList<Book>();
@@ -58,6 +56,16 @@ public class HomeController {
         books.add(new Book("DecoMorreno", "Extra Dark"));
     }
 
+    private List<? extends Category> getItems(String category) {
+        if (category.equals("books")) {
+            return books;
+        }
+        if (category.equals("movies")) {
+            return movies;
+        }
+        return empty;
+    }
+
     private void setResults(Model model, List<? extends Category> results) {
         List<List<String>> res = new ArrayList<List<String>>();
         for (Category result : results) {
@@ -67,47 +75,40 @@ public class HomeController {
         if (res.isEmpty()) {
             return;
         }
-        model.addAttribute("category", results.get(0).getCategory());
         model.addAttribute("headers", results.get(0).getHeaders());
+    }
+
+    private void setOptions(Model model, String category) {
+        if (category.equals("books")) {
+            model.addAttribute("searchOptions", this.optionsBooks);
+        } else if (category.equals("movies")) {
+            model.addAttribute("searchOptions", this.optionsMovies);
+        }
     }
 
     @GetMapping("/")
     public String home(Model model) {
-        this.booksOption.select();
-        this.moviesOption.unselect();
         this.setResults(model, books);
-        model.addAttribute("searchOptions", this.options);
+        this.setOptions(model, "books");
+        model.addAttribute("category", "Books");
         return "index";
-    }
-
-    private List<? extends Category>getCategory(String category) {
-        if (category.toLowerCase().equals("books")) {
-            this.booksOption.select();
-            this.moviesOption.unselect();
-            return books;
-        }
-        if (category.toLowerCase().equals("movies")) {
-            this.booksOption.unselect();
-            this.moviesOption.select();
-            return movies;
-        }
-        return empty;
     }
 
     @PostMapping("/category")
     public String search(String category, Model model) {
-        this.setResults(model, this.getCategory(category));
-        model.addAttribute("searchOptions", this.options);
+        this.setResults(model, this.getItems(category.toLowerCase()));
+        this.setOptions(model, category.toLowerCase());
+        model.addAttribute("category", category);
         return "index :: category";
     }
 
     @GetMapping("/search")
     public String search(String query, String category, String filter, Model model) {
-        System.out.println(query + " " + category + " " + filter);
-        this.setResults(model, this.getCategory(category) 
+        this.setResults(model, this.getItems(category.toLowerCase()) 
                 .stream()
                 .filter(s -> s.filter(filter.toLowerCase(), query.toLowerCase()))
                 .toList());
+        model.addAttribute("category", category);
         return "index :: search-results";
     }
 }

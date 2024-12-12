@@ -11,7 +11,7 @@
 <body>
     <main class="container">
         <section id="category" th:fragment="category">
-            <h1 th:text="${category}">Error</h1>
+            <h1 th:text="'Search ' + ${category}">Error</h1>
             <div class="grid">
                 <select name="category"
                         hx-post="/category"
