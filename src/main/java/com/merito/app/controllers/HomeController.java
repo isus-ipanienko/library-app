@@ -95,7 +95,7 @@ public class HomeController {
     }
 
     @PostMapping("/category")
-    public String search(String category, Model model) {
+    public String category(String category, Model model) {
         this.setResults(model, this.getItems(category.toLowerCase()));
         this.setOptions(model, category.toLowerCase());
         model.addAttribute("category", category);
