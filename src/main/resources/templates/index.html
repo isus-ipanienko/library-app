@@ -1,0 +1,66 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>Library</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <script src="https://unpkg.com/htmx.org@2.0.1"></script>
+</head>
+<body>
+    <main class="container">
+        <section id="category" th:fragment="category">
+            <h1 th:text="${category}">Error</h1>
+            <div class="grid">
+                <select name="category"
+                        hx-post="/category"
+                        hx-target="#category"
+                        class="searchinput">
+                    <option th:each="option : ${searchOptions}"
+                            th:value="${option.getOption()}"
+                            th:text="${option.getOption()}"
+                            th:selected="${option.isSelected()}">
+                            Error
+                    </option>
+                </select>
+                <select name="filter"
+                        class="searchinput">
+                    <option th:each="header : ${headers}"
+                            th:value="${header}"
+                            th:text="${header}">
+                            Error
+                    </option>
+                </select>
+            </div>
+            <input type="text"
+                   name="query"
+                   hx-get="/search"
+                   hx-target="#search-results"
+                   hx-trigger="keyup changed delay:500ms"
+                   hx-include="select.searchinput"
+                   placeholder="Search...">
+            <table id="search-results" th:fragment="search-results">
+                <thead>
+                    <tr>
+                        <th th:each="header : ${headers}">
+                            <span th:text="${header}"> Error </span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${results.empty}">
+                        <td colspan="${#lists.size(headers)}"> No Results Available </td>
+                    </tr>
+                    <tr th:each="result : ${results}">
+                        <td th:each="data : ${result}">
+                            <span th:text="${data}"> Error </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+    </main>
+</body>
+</html>
